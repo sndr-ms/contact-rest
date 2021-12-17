@@ -27,6 +27,15 @@ public class ContactServiceImpl implements ContactService {
 		
 		return contactList;
 	}
+	
+	@Path("/")
+	@GET
+	@Produces("text/plain")
+	public String index(){
+		
+		String message ="List (GET) - contact/list \nContact (GET) - contact/{id} \nSave (POST) - contact/save\nUpdate (PUT) - contact/update/{id}\nDelete (DELETE) - contact/delete/{id}";
+		return message;
+	}
 
 	@Path("/save")
 	@Consumes("application/json")
