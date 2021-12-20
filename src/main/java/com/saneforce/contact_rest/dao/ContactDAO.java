@@ -1,7 +1,7 @@
 package com.saneforce.contact_rest.dao;
 
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,23 +9,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.postgresql.ds.PGConnectionPoolDataSource;
+
 import com.saneforce.contact_rest.entity.Contact;
 
 public class ContactDAO {
 
-	Properties properties;
-	Connection connection;
+	PGConnectionPoolDataSource source;
+
+	public ContactDAO() {
+		
+		Properties properties =new Properties();
+		try {
+			properties.load(this.getClass().getResourceAsStream("/application.properties"));
+			
+			source = new PGConnectionPoolDataSource();
+			
+			source.setDatabaseName(properties.getProperty("database.name"));
+			source.setServerNames(new String[] {properties.getProperty("database.server")});
+			source.setUser(properties.getProperty("database.username"));
+			source.setPassword(properties.getProperty("database.password"));
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
 	public int save(Contact contact) {
 		
 		int insertedCount =0;
-		properties =new Properties();
-		try {
-			properties.load(this.getClass().getResourceAsStream("/application.properties"));
-			
-			Class.forName(properties.getProperty("database.driver"));
-			connection = this.getConnection();
-			
+		
+		try(Connection connection = source.getConnection()) {
 			PreparedStatement insert = connection.prepareStatement("Insert Into contact(name,mobile_number,email) values(?,?,?)");
 			
 			insert.setString(1, contact.getName());
@@ -33,7 +48,7 @@ public class ContactDAO {
 			insert.setString(3, contact.getEmail());
 			
 			insertedCount = insert.executeUpdate();
-		} catch (Exception e) {
+		} catch (SQLException e) {
 		
 			e.printStackTrace();
 		}
@@ -45,13 +60,7 @@ public class ContactDAO {
 		
 		int updatedCount =0;
 		
-		properties =new Properties();
-		try {
-			properties.load(this.getClass().getResourceAsStream("/application.properties"));
-			
-			Class.forName(properties.getProperty("database.driver"));
-			connection = this.getConnection();
-			
+		try(Connection connection = source.getConnection()) {
 			String query = "UPDATE contact SET ";
 			
 			if(contact.getId() != null) {
@@ -80,7 +89,7 @@ public class ContactDAO {
 			}
 			
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 		
 			e.printStackTrace();
 		}
@@ -91,12 +100,8 @@ public class ContactDAO {
 	public List<Contact> getList(){
 		
 		List<Contact> contactList = new ArrayList<Contact>();
-		properties =new Properties();
-		try {
-			properties.load(this.getClass().getResourceAsStream("/application.properties"));
-			
-			Class.forName(properties.getProperty("database.driver"));
-			connection = this.getConnection();
+		
+		try(Connection connection = source.getConnection()) {
 			
 			PreparedStatement select = connection.prepareStatement("Select id,name,email,mobile_number from contact");
 			ResultSet result = select.executeQuery();
@@ -113,23 +118,19 @@ public class ContactDAO {
 			}
 			
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 		
 			e.printStackTrace();
 		}
-		System.out.println("Contact List : "+contactList);
+		
 		return contactList;
 	}
 	
 	public Contact getContact(int id) {
 	
 		Contact contact=null;
-		properties =new Properties();
-		try {
-			properties.load(this.getClass().getResourceAsStream("/application.properties"));
-			
-			Class.forName(properties.getProperty("database.driver"));
-			connection = this.getConnection();
+		
+		try(Connection connection = source.getConnection()) {
 			
 			PreparedStatement select = connection.prepareStatement("Select id,name,email,mobile_number from contact where id="+id);
 			ResultSet result = select.executeQuery();
@@ -146,7 +147,7 @@ public class ContactDAO {
 			}
 			
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 		
 			e.printStackTrace();
 		}
@@ -156,25 +157,16 @@ public class ContactDAO {
 	
 	public void delete(int id) {
 		
-		properties =new Properties();
-		try {
-			properties.load(this.getClass().getResourceAsStream("/application.properties"));
-			
-			Class.forName(properties.getProperty("database.driver"));
-			connection = this.getConnection();
+		try(Connection connection = source.getConnection()) {
 			
 			PreparedStatement select = connection.prepareStatement("Delete from contact where id="+id);
 			select.executeUpdate();
 			
-		} catch (Exception e) {
+		} catch (SQLException e) {
 		
 			e.printStackTrace();
 		}
 		
 	}
 	
-	private Connection getConnection() throws SQLException  {
-		
-		return DriverManager.getConnection(properties.getProperty("database.connection_url"),properties.getProperty("database.username"),properties.getProperty("database.password"));
-	}
 }

@@ -46,6 +46,7 @@ public class ContactServiceImpl implements ContactService {
 		HashMap<String,Object> result = new HashMap<String,Object>();
 		
 		int insertedCount = this.save(contact);
+		
 		if(insertedCount > 0) {
 			result.put("success", true);
 			result.put("message", "Contact saved");
@@ -97,7 +98,6 @@ public class ContactServiceImpl implements ContactService {
 		
 		return result;
 	}
-	
 	
 	@Path("/update/{id}")
 	@Consumes("application/json")
