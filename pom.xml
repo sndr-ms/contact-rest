@@ -34,19 +34,6 @@
     </properties>
 
 	<dependencies>
-		<dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.core</artifactId>
-            <version>${osgi.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-    		<groupId>org.osgi</groupId>
-		    <artifactId>org.osgi.util.tracker</artifactId>
-		    <version>1.5.1</version>
-		    <scope>provided</scope>
-		</dependency>
-
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
@@ -75,7 +62,6 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Bundle-Version>${project.version}</Bundle-Version>
-                        <Bundle-Activator>com.saneforce.contact_rest.Activator</Bundle-Activator>
                        <Export-Package>
                             com.saneforce.contact_rest*;version=${project.version}
                         </Export-Package>
